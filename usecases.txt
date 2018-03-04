@@ -1,17 +1,17 @@
 use case
 
 - author: professional
-- Professional schedules set of classes to client
-- Class has date, a done completed status
+- Professional schedules set of appointments to client
+- Appointment has date, a done completed status
 
 Entities InvolveD
 Professional
 Client
-Class
+Appointment
 
 Professional
 Client
-Class
+Appointment
 
 
 
