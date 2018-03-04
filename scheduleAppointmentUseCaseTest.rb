@@ -1,16 +1,9 @@
 require 'test/unit'
 require './scheduleAppointmentUseCase'
 
-class AppointmentRepoInvalidClientRequestStub
-    attr_reader :scheduleAppointmentCalled
-
+class AppointmentRepoInvalidClientStub
     def isClientAClientOfThisProfessor()
         return false
-    end
-
-    def scheduleAppointment(appointmentToSchedule) 
-        @scheduleAppointmentCalled = true
-        yield "os9s9s"
     end
 end
 
@@ -59,16 +52,14 @@ class ScheduleAppointmentUseCaseTest < Test::Unit::TestCase
     end
 
     def testScheduleAppointmentShouldNotPresentAppointmentWhenCLientNotACLientOfProfessor
-        appointmentRepository = AppointmentRepoInvalidClientRequestStub.new
+        appointmentRepository = AppointmentRepoInvalidClientStub.new
         scheduleAppointmentUseCaseOutputPort = ScheduleAppointmentPresenterSpy.new
         scheduleAppointmentUseCase = ScheduleAppointmentUseCase.new(appointmentRepository, scheduleAppointmentUseCaseOutputPort)
-
-        assert(!appointmentRepository.scheduleAppointmentCalled)
 
         Struct.new("ReqModel", :professorId, :clientId, :date)
         reqModel = Struct::ReqModel.new("junim@gmail.com", "jose@gmail.com", "")
         scheduleAppointmentUseCase.scheduleAppointment(reqModel)
-        assert(!appointmentRepository.scheduleAppointmentCalled)
+
         assert(!scheduleAppointmentUseCaseOutputPort.presentAppointmentCalled)
         assert(scheduleAppointmentUseCaseOutputPort.presentErrorCalled)
     end

@@ -8,8 +8,7 @@ class ScheduleAppointmentUseCase
     end
 
     def scheduleAppointment(reqModel)
-        isRequestValid = @appointmentRepository.isClientAClientOfThisProfessor()
-        if isRequestValid
+        if @appointmentRepository.isClientAClientOfThisProfessor()
             appointment = Appointment.new(reqModel.professorId, reqModel.clientId, reqModel.date)
             @appointmentRepository.scheduleAppointment(appointment) { 
                 |appointmentId| @scheduleAppointmentUseCaseOutputPort.presentAppointment(appointmentId)
