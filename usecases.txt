@@ -1,0 +1,17 @@
+use case
+
+- author: professional
+- Professional schedules set of classes to client
+- Class has date, a done completed status
+
+Entities InvolveD
+Professional
+Client
+Class
+
+Professional
+Client
+Class
+
+
+
