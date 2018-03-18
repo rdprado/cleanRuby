@@ -3,7 +3,7 @@ require './scheduleAppointmentUseCaseInteractor'
 
 class AppointmentRepoInvalidClientStub
     def isClientAClientOfThisCoach()
-        return false
+        yield(false)
     end
 end
 
@@ -13,7 +13,7 @@ class AppointmentRepoSpy
 
     def isClientAClientOfThisCoach()
         @isClientAClientOfThisCoachCalled = true
-        return true
+        yield(true)
     end
 
     def scheduleAppointment(appointmentToSchedule) 

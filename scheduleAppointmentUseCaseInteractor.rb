@@ -13,16 +13,22 @@ class ScheduleAppointmentUseCaseInteractor
     end
 
     def scheduleAppointment(reqModel)
-        if @appointmentRepository.isClientAClientOfThisCoach()
-            appointment = Appointment.new(reqModel.coachId, reqModel.clientId, reqModel.date)
-            @appointmentRepository.scheduleAppointment(appointment) { 
-                |clientId, clientName, coachId, coachName, date|
-                resModel = ResModel.new(clientId, clientName, coachId, coachName, date);
-                @interactorOutput.presentAppointment(resModel)
-            }
-        else
-            resModel = NotAClientResModel.new(reqModel.clientId, reqModel.coachId);
-            @interactorOutput.presentNotAClientOfProfessorError(resModel);
-        end
+        @appointmentRepository.isClientAClientOfThisCoach() {
+            |isClient| isClient ? clientIsAClientOfThisCoach(reqModel) : clientNotAClientOfThisCoach(reqModel)
+        }
+    end
+
+    def clientIsAClientOfThisCoach(reqModel)
+        appointment = Appointment.new(reqModel.coachId, reqModel.clientId, reqModel.date)
+                @appointmentRepository.scheduleAppointment(appointment) { 
+                    |clientId, clientName, coachId, coachName, date|
+                    resModel = ResModel.new(clientId, clientName, coachId, coachName, date);
+                    @interactorOutput.presentAppointment(resModel)
+                }
+    end
+
+    def clientNotAClientOfThisCoach(reqModel)
+        resModel = NotAClientResModel.new(reqModel.clientId, reqModel.coachId);
+                @interactorOutput.presentNotAClientOfProfessorError(resModel);
     end
 end
