@@ -10,14 +10,14 @@ class RepoSpy
     attr_reader :addClientToCoachCalled
 
     def isClientAClientOfThisCoach(clientId, coachId)
-        return false
+        yield(false)
     end
 
-    def coachExists(coachId)
-        return true
+    def doesCoachExist(coachId)
+        yield(true)
     end
 
-    def clientExists(clientId)
+    def doesClientExist(clientId)
         #return true
         yield(true)
     end
@@ -34,15 +34,11 @@ class RepoInvalidClientStub
 
     attr_reader :addClientToCoachCalled
 
-    def isClientAClientOfThisCoach()
-        return false
+    def doesCoachExist(coachId)
+        yield(true)
     end
 
-    def coachExists(coachId)
-        return true
-    end
-
-    def clientExists(clientId)
+    def doesClientExist(clientId)
         #return false
         yield(false)
     end
@@ -56,15 +52,11 @@ class RepoInvalidCoachStub
 
     attr_reader :addClientToCoachCalled
 
-    def isClientAClientOfThisCoach()
-        return false
+    def doesCoachExist(coachId)
+        yield(false)
     end
 
-    def coachExists(coachId)
-        return false
-    end
-
-    def clientExists(clientId)
+    def doesClientExist(clientId)
         #return true
         yield(true)
     end
@@ -79,14 +71,14 @@ class RepoAlreadyAClientStub
     attr_reader :addClientToCoachCalled
 
     def isClientAClientOfThisCoach(clientId, coachId)
-        return true
+        yield(true)
     end
 
-    def coachExists(coachId)
-        return true
+    def doesCoachExist(coachId)
+        yield(true)
     end
 
-    def clientExists(clientId)
+    def doesClientExist(clientId)
         #return true
         yield(true)
     end
