@@ -18,8 +18,8 @@ class RepoSpy
     end
 
     def clientExists(clientId)
-        return true
-        #yield(true)
+        #return true
+        yield(true)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -43,8 +43,8 @@ class RepoInvalidClientStub
     end
 
     def clientExists(clientId)
-        return false
-        #yield(false)
+        #return false
+        yield(false)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -65,8 +65,8 @@ class RepoInvalidCoachStub
     end
 
     def clientExists(clientId)
-        return true
-        #yield(true)
+        #return true
+        yield(true)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -77,10 +77,6 @@ end
 class RepoAlreadyAClientStub
 
     attr_reader :addClientToCoachCalled
-    def addClientToCoach()
-        @addClientToCoachCalled = true
-        yield "dd" "dd"
-    end
 
     def isClientAClientOfThisCoach(clientId, coachId)
         return true
@@ -91,7 +87,8 @@ class RepoAlreadyAClientStub
     end
 
     def clientExists(clientId)
-        return true
+        #return true
+        yield(true)
     end
 end
 
