@@ -1,10 +1,11 @@
 #module Entities
-class Client
+class Coach
     attr_accessor :id, :name
 
     def initialize(id, name)
         @id = id
         @name = name
     end
+
 end
 #end
