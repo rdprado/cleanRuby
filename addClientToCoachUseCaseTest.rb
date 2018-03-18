@@ -5,7 +5,7 @@ require './coach'
 #require Entities
 
 
-class CoachRepositorySpy
+class RepoSpy
 
     attr_reader :addClientToCoachCalled
 
@@ -19,6 +19,7 @@ class CoachRepositorySpy
 
     def clientExists(clientId)
         return true
+        #yield(true)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -29,7 +30,7 @@ class CoachRepositorySpy
     end
 end
 
-class CoachRepositoryClientInvalidStub
+class RepoInvalidClientStub
 
     attr_reader :addClientToCoachCalled
 
@@ -43,6 +44,7 @@ class CoachRepositoryClientInvalidStub
 
     def clientExists(clientId)
         return false
+        #yield(false)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -50,7 +52,7 @@ class CoachRepositoryClientInvalidStub
     end
 end
 
-class CoachRepositoryCoachInvalidStub
+class RepoInvalidCoachStub
 
     attr_reader :addClientToCoachCalled
 
@@ -59,11 +61,12 @@ class CoachRepositoryCoachInvalidStub
     end
 
     def coachExists(coachId)
-        return true
+        return false
     end
 
     def clientExists(clientId)
-        return false
+        return true
+        #yield(true)
     end
 
     def addClientToCoach(clientId, coachId)
@@ -71,24 +74,24 @@ class CoachRepositoryCoachInvalidStub
     end
 end
 
-class CoachRepositoryCoachInvalidStub
+class RepoAlreadyAClientStub
 
     attr_reader :addClientToCoachCalled
+    def addClientToCoach()
+        @addClientToCoachCalled = true
+        yield "dd" "dd"
+    end
 
-    def isClientAClientOfThisCoach()
-        return false
+    def isClientAClientOfThisCoach(clientId, coachId)
+        return true
     end
 
     def coachExists(coachId)
-        return false
+        return true
     end
 
     def clientExists(clientId)
         return true
-    end
-
-    def addClientToCoach(clientId, coachId)
-        @addClientToCoachCalled = true
     end
 end
 
@@ -116,70 +119,47 @@ class AddClientToCoachPresenterSpy
     end
 end
 
-class CoachRepoAlreadyAClientStub
-
-    attr_reader :addClientToCoachCalled
-    def addClientToCoach()
-        @addClientToCoachCalled = true
-        yield "dd" "dd"
-    end
-
-    def isClientAClientOfThisCoach(clientId, coachId)
-        return true
-    end
-
-    def coachExists(coachId)
-        return true
-    end
-
-    def clientExists(clientId)
-        return true
-    end
-end
-
 class AddClientToCoachUseCaseTest < Test::Unit::TestCase
     def testAddClientToCoachUseCaseTestShouldCallCoachRepoAndOutput
-        coachRepository = CoachRepositorySpy.new
+        repo = RepoSpy.new
         presenter = AddClientToCoachPresenterSpy.new
-        addClientToCoachUseCase = AddClientToCoachUseCase.new(coachRepository, presenter)
+        addClientToCoachUseCase = AddClientToCoachUseCase.new(repo, presenter)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
 
-        
         reqModel = AddClientToCoachUseCase::ReqModel.new("junim@gmail.com", "lalalau@gmail.com")
         addClientToCoachUseCase.addClientToCoach(reqModel)
 
-        assert(coachRepository.addClientToCoachCalled)
+        assert(repo.addClientToCoachCalled)
         assert(presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
-
     end
 
     def testShouldNotAddCLientWhenAlreadyAClient
-        coachRepository = CoachRepoAlreadyAClientStub.new
+        repo = RepoAlreadyAClientStub.new
         presenter = AddClientToCoachPresenterSpy.new
-        addClientToCoachUseCase = AddClientToCoachUseCase.new(coachRepository, presenter)
+        addClientToCoachUseCase = AddClientToCoachUseCase.new(repo, presenter)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
 
         reqModel = AddClientToCoachUseCase::ReqModel.new("junim@gmail.com", "lalalau@gmail.com")
         addClientToCoachUseCase.addClientToCoach(reqModel)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(presenter.presentAlreadyAClientErrorCalled)
     end
 
     def testShouldPresentErrorWhenClientDoesntExist
-        coachRepository = CoachRepositoryClientInvalidStub.new
+        repo = RepoInvalidClientStub.new
         presenter = AddClientToCoachPresenterSpy.new
-        addClientToCoachUseCase = AddClientToCoachUseCase.new(coachRepository, presenter)
+        addClientToCoachUseCase = AddClientToCoachUseCase.new(repo, presenter)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
         assert(!presenter.presentUnexistentClientErrorCalled)
@@ -187,26 +167,27 @@ class AddClientToCoachUseCaseTest < Test::Unit::TestCase
         reqModel = AddClientToCoachUseCase::ReqModel.new("junim@gmail.com", "lalalau@gmail.com")
         addClientToCoachUseCase.addClientToCoach(reqModel)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
         assert(presenter.presentUnexistentClientErrorCalled)
     end
 
-    def testShouldPresentErrorWhenCoach
-        coachRepository = CoachRepositoryCoachInvalidStub.new
+    def testShouldPresentErrorWhenCoachDoesNotExist
+        repo = RepoInvalidCoachStub.new
         presenter = AddClientToCoachPresenterSpy.new
-        addClientToCoachUseCase = AddClientToCoachUseCase.new(coachRepository, presenter)
+        addClientToCoachUseCase = AddClientToCoachUseCase.new(repo, presenter)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
         assert(!presenter.presentUnexistentClientErrorCalled)
+        assert(!presenter.presentUnexistentCoachErrorCalled)
 
         reqModel = AddClientToCoachUseCase::ReqModel.new("junim@gmail.com", "lalalau@gmail.com")
         addClientToCoachUseCase.addClientToCoach(reqModel)
 
-        assert(!coachRepository.addClientToCoachCalled)
+        assert(!repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(!presenter.presentAlreadyAClientErrorCalled)
         assert(!presenter.presentUnexistentClientErrorCalled)
