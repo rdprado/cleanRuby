@@ -4,7 +4,6 @@ require './client'
 require './coach'
 #require Entities
 
-
 class RepoSpy
 
     attr_reader :addClientToCoachCalled
