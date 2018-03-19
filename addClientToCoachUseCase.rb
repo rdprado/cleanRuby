@@ -15,7 +15,7 @@ class AddClientToCoachUseCase
     def addClientToCoach(reqModel)
         @coachRepository.doesClientExist(reqModel.clientId) {
             |doesClientExist, client| 
-            doesClientExist ? clientExistsCheckCoach(client, reqModel.coachId) : clientDoesntExistError(reqModel)
+            doesClientExist ? clientExistsCheckCoach(client, reqModel.coachId) : clientDoesntExistError(reqModel.clientId)
         } 
     end
 
@@ -39,8 +39,8 @@ class AddClientToCoachUseCase
         } 
     end
 
-    def clientDoesntExistError(reqModel)
-        resModel = UnexistentClientResModel.new(reqModel.clientId)
+    def clientDoesntExistError(clientId)
+        resModel = UnexistentClientResModel.new(clientId)
          @interactorOutput.presentUnexistentClientError(resModel)
     end
 
