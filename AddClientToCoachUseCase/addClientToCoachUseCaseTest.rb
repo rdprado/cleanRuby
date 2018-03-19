@@ -1,7 +1,7 @@
 require 'test/unit'
-require './addClientToCoachUseCase'
-require './client'
-require './coach'
+require './AddClientToCoachUseCase/addClientToCoachUseCase'
+require './Entities/client'
+require './Entities/coach'
 #require Entities
 
 class RepoSpy
@@ -26,59 +26,22 @@ class RepoSpy
     end
 end
 
-class RepoInvalidClientStub
 
-    attr_reader :addClientToCoachCalled
-
-    def isClientAClientOfThisCoach(client, coach)
-        yield(true)
-    end
-
-    def doesCoachExist(coachId)
-        yield(true, Coach.new(coachId, "Marcos"))
-    end
-
+class RepoInvalidClientStub < RepoSpy
     def doesClientExist(clientId)
         yield(false, nil)
     end
-
-    def addClientToCoach(client, coach)
-        @addClientToCoachCalled = true
-    end
 end
 
-class RepoInvalidCoachStub
-
-    attr_reader :addClientToCoachCalled
-
+class RepoInvalidCoachStub < RepoSpy
     def doesCoachExist(coachId)
         yield(false, nil)
     end
-
-    def doesClientExist(clientId)
-        yield(true, Client.new(clientId, "Joao"))
-    end
-
-    def addClientToCoach(client, coach)
-        @addClientToCoachCalled = true
-    end
 end
 
-class RepoAlreadyAClientStub
-
-    attr_reader :addClientToCoachCalled
-
+class RepoAlreadyAClientStub < RepoSpy
     def isClientAClientOfThisCoach(client, coach)
         yield(true)
-    end
-
-    def doesCoachExist(coachId)
-        yield(true, Coach.new(coachId, "Marcos"))
-        
-    end
-
-    def doesClientExist(clientId)
-        yield(true, Client.new(clientId, "Joao"))
     end
 end
 
