@@ -9,24 +9,21 @@ class RepoSpy
 
     attr_reader :addClientToCoachCalled
 
-    def isClientAClientOfThisCoach(clientId, coachId)
+    def isClientAClientOfThisCoach(client, coach)
         yield(false)
     end
 
     def doesCoachExist(coachId)
-        yield(true)
+        yield(true, Coach.new(coachId, "Marcos"))
     end
 
     def doesClientExist(clientId)
-        #return true
-        yield(true)
+        yield(true, Client.new(clientId, "Joao"))
     end
 
-    def addClientToCoach(clientId, coachId)
+    def addClientToCoach(client, coach)
         @addClientToCoachCalled = true
-        client = Client.new(clientId, "Joao")
-        coach = Coach.new(coachId, "Marcos")
-        yield(client, coach)
+        yield
     end
 end
 
@@ -34,16 +31,19 @@ class RepoInvalidClientStub
 
     attr_reader :addClientToCoachCalled
 
-    def doesCoachExist(coachId)
+    def isClientAClientOfThisCoach(client, coach)
         yield(true)
     end
 
-    def doesClientExist(clientId)
-        #return false
-        yield(false)
+    def doesCoachExist(coachId)
+        yield(true, Coach.new(coachId, "Marcos"))
     end
 
-    def addClientToCoach(clientId, coachId)
+    def doesClientExist(clientId)
+        yield(false, nil)
+    end
+
+    def addClientToCoach(client, coach)
         @addClientToCoachCalled = true
     end
 end
@@ -53,15 +53,14 @@ class RepoInvalidCoachStub
     attr_reader :addClientToCoachCalled
 
     def doesCoachExist(coachId)
-        yield(false)
+        yield(false, nil)
     end
 
     def doesClientExist(clientId)
-        #return true
-        yield(true)
+        yield(true, Client.new(clientId, "Joao"))
     end
 
-    def addClientToCoach(clientId, coachId)
+    def addClientToCoach(client, coach)
         @addClientToCoachCalled = true
     end
 end
@@ -70,17 +69,17 @@ class RepoAlreadyAClientStub
 
     attr_reader :addClientToCoachCalled
 
-    def isClientAClientOfThisCoach(clientId, coachId)
+    def isClientAClientOfThisCoach(client, coach)
         yield(true)
     end
 
     def doesCoachExist(coachId)
-        yield(true)
+        yield(true, Coach.new(coachId, "Marcos"))
+        
     end
 
     def doesClientExist(clientId)
-        #return true
-        yield(true)
+        yield(true, Client.new(clientId, "Joao"))
     end
 end
 
