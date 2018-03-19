@@ -1,10 +1,12 @@
 require 'test/unit'
 require './ScheduleAppointmentUseCase/scheduleAppointmentUseCaseInteractor'
+require './Entities/client'
+require './Entities/coach'
 
 class RepoSpy
     attr_reader :scheduleAppointmentCalled
 
-    def isClientAClientOfThisCoach()
+    def isClientAClientOfThisCoach(client, coach)
         yield(true)
     end
 
@@ -12,54 +14,102 @@ class RepoSpy
         @scheduleAppointmentCalled = true
         yield("", "", "", "", "", "")
     end
+
+    def doesCoachExist(coachId)
+        yield(true, Coach.new(coachId, "Marcos"))
+    end
+
+    def doesClientExist(clientId)
+        yield(true, Client.new(clientId, "Joao"))
+    end
 end
 
-class InvalidClientStub < RepoSpy
+class RepoUnexistentClientStub < RepoSpy
+    def doesClientExist(clientId)
+        yield(false, nil)
+    end 
+end
+
+class RepoUnexistentCoachStub < RepoSpy
     def isClientAClientOfThisCoach()
+        yield(true)
+    end
+
+    def doesCoachExist(coachId)
+        yield(false, nil)
+    end
+end
+
+class NotAClientStub < RepoSpy
+    def isClientAClientOfThisCoach(client, coach)
         yield(false)
     end
 end
 
 class ScheduleAppointmentPresenterSpy
-    attr_reader :presentAppointmentCalled, :presentNotAClientOfProfessorErrorCalled
+    attr_reader :presentAppointmentCalled, 
+    :presentNotAClientOfProfessorErrorCalled,
+    :presentUnexistentClientErrorCalled
     def presentAppointment(resModel) 
         @presentAppointmentCalled = true
     end
     def presentNotAClientOfProfessorError(resModel) 
         @presentNotAClientOfProfessorErrorCalled = true
     end
+
+    def presentUnexistentClientError(resModel) 
+        @presentUnexistentClientErrorCalled = true
+    end
 end
 
 class ScheduleAppointmentUseCaseTest < Test::Unit::TestCase
     def testScheduleAppointmentShouldCallAppointmentRepoAndUseCaseOutput
-        appointmentRepository = RepoSpy.new
-        scheduleAppointmentUseCaseOutputPort = ScheduleAppointmentPresenterSpy.new
-        scheduleAppointmentUseCase = ScheduleAppointmentUseCaseInteractor.new(appointmentRepository, scheduleAppointmentUseCaseOutputPort)
+        repo = RepoSpy.new
+        interactorOutput = ScheduleAppointmentPresenterSpy.new
+        interactornInput = ScheduleAppointmentUseCaseInteractor.new(repo, interactorOutput)
 
-        assert(!appointmentRepository.scheduleAppointmentCalled)
-        assert(!scheduleAppointmentUseCaseOutputPort.presentAppointmentCalled)
+        assert(!repo.scheduleAppointmentCalled)
+        assert(!interactorOutput.presentAppointmentCalled)
 
-        reqModel = ScheduleAppointmentUseCaseInteractor::ReqModel.new("junim@gmail.com", "lalalau@gmail.com", "")
-        scheduleAppointmentUseCase.scheduleAppointment(reqModel)
+        reqModel = ScheduleAppointmentUseCaseInteractor::ReqModel.new("junim@gmail.com", "lalalau@gmail.com", "21/10", "malhar")
+        interactornInput.scheduleAppointment(reqModel)
 
-        assert(appointmentRepository.scheduleAppointmentCalled)
-        assert(scheduleAppointmentUseCaseOutputPort.presentAppointmentCalled)
-        assert(!scheduleAppointmentUseCaseOutputPort.presentNotAClientOfProfessorErrorCalled)
+        assert(repo.scheduleAppointmentCalled)
+        assert(interactorOutput.presentAppointmentCalled)
+        assert(!interactorOutput.presentNotAClientOfProfessorErrorCalled)
     end
 
     def testScheduleAppointmentShouldNotPresentAppointmentWhenCLientNotACLientOfcoach
-        appointmentRepository = InvalidClientStub.new
-        scheduleAppointmentUseCaseOutputPort = ScheduleAppointmentPresenterSpy.new
-        scheduleAppointmentUseCase = ScheduleAppointmentUseCaseInteractor.new(appointmentRepository, scheduleAppointmentUseCaseOutputPort)
+        repo = NotAClientStub.new
+        interactorOutput = ScheduleAppointmentPresenterSpy.new
+        interactornInput = ScheduleAppointmentUseCaseInteractor.new(repo, interactorOutput)
 
-        assert(!appointmentRepository.scheduleAppointmentCalled)
+        assert(!repo.scheduleAppointmentCalled)
 
-        reqModel = ScheduleAppointmentUseCaseInteractor::ReqModel.new("junim@gmail.com", "lalalau@gmail.com", "")
-        scheduleAppointmentUseCase.scheduleAppointment(reqModel)
+        reqModel = ScheduleAppointmentUseCaseInteractor::ReqModel.new("junim@gmail.com", "lalalau@gmail.com", "21/10", "malhar")
+        interactornInput.scheduleAppointment(reqModel)
 
-        assert(!appointmentRepository.scheduleAppointmentCalled)
-        assert(!scheduleAppointmentUseCaseOutputPort.presentAppointmentCalled)
-        assert(scheduleAppointmentUseCaseOutputPort.presentNotAClientOfProfessorErrorCalled)
+        assert(!repo.scheduleAppointmentCalled)
+        assert(!interactorOutput.presentAppointmentCalled)
+        assert(interactorOutput.presentNotAClientOfProfessorErrorCalled)
+    end
+
+    def testShouldPresentErrorWhenClientDoesntExist
+        repo = RepoUnexistentClientStub.new
+        interactorOutput = ScheduleAppointmentPresenterSpy.new
+        interactornInput = ScheduleAppointmentUseCaseInteractor.new(repo, interactorOutput)
+
+        assert(!repo.scheduleAppointmentCalled)
+        assert(!interactorOutput.presentAppointmentCalled)
+        assert(!interactorOutput.presentNotAClientOfProfessorErrorCalled)
+        assert(!interactorOutput.presentUnexistentClientErrorCalled)
+
+        reqModel = ScheduleAppointmentUseCaseInteractor::ReqModel.new("junim@gmail.com", "lalalau@gmail.com", "21/10", "malhar")
+        interactornInput.scheduleAppointment(reqModel)
+
+        assert(!repo.scheduleAppointmentCalled)
+        assert(!interactorOutput.presentNotAClientOfProfessorErrorCalled)
+        assert(interactorOutput.presentUnexistentClientErrorCalled)
     end
 
 end

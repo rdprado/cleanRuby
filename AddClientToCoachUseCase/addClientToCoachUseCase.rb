@@ -34,8 +34,8 @@ class AddClientToCoachUseCase
 
     def validClientAndCoach(client, coach)
         @coachRepository.addClientToCoach(client, coach) {
-                resModel = ResModel.new(coach.id, client.id, coach.name, client.name)
-                @interactorOutput.presentAddedClientToCoach(resModel)
+            resModel = ResModel.new(client.id, client.name, coach.id, coach.name)
+            @interactorOutput.presentAddedClientToCoach(resModel)
         } 
     end
 

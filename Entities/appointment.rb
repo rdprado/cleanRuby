@@ -1,7 +1,9 @@
 class Appointment
-    def initialize(professorId, clientId, date)
-        @professorId = professorId
-        @clientId = clientId
+
+    attr_accessor :date, :title
+
+    def initialize(date, title)
         @date = date
+        @title = title
     end
 end
