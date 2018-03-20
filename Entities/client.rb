@@ -1,9 +1,9 @@
 #module Entities
 class Client
-    attr_accessor :id, :name
+    attr_accessor :email, :name
 
-    def initialize(id, name)
-        @id = id
+    def initialize(email, name)
+        @email = email
         @name = name
     end
 end

@@ -12,12 +12,12 @@ class RepoSpy
         yield(false)
     end
 
-    def doesCoachExist(coachId)
-        yield(true, Coach.new(coachId, "Marcos"))
+    def doesCoachExist(coachEmail)
+        yield(true, Coach.new(coachEmail, "Marcos"))
     end
 
-    def doesClientExist(clientId)
-        yield(true, Client.new(clientId, "Joao"))
+    def doesClientExist(clientEmail)
+        yield(true, Client.new(clientEmail, "Joao"))
     end
 
     def addClientToCoach(client, coach)
@@ -28,13 +28,13 @@ end
 
 
 class RepoInvalidClientStub < RepoSpy
-    def doesClientExist(clientId)
+    def doesClientExist(clientEmail)
         yield(false, nil)
     end
 end
 
 class RepoInvalidCoachStub < RepoSpy
-    def doesCoachExist(coachId)
+    def doesCoachExist(coachEmail)
         yield(false, nil)
     end
 end

@@ -1,11 +1,11 @@
 class AddClientToCoachUseCase
 
-    ReqModel = Struct.new(:clientId, :coachId)
-    ResModel = Struct.new(:clientId, :clientName, :coachId, :coachName)
+    ReqModel = Struct.new(:clientEmail, :coachEmail)
+    ResModel = Struct.new(:clientEmail, :clientName, :coachEmail, :coachName)
 
-    AlreadyAClientResModel = Struct.new(:clientId, :clientName, :coachId, :coachName)
-    UnexistentClientResModel = Struct.new(:clientId)
-    UnexistentCoachResModel = Struct.new(:coachId)
+    AlreadyAClientResModel = Struct.new(:clientEmail, :clientName, :coachEmail, :coachName)
+    UnexistentClientResModel = Struct.new(:clientEmail)
+    UnexistentCoachResModel = Struct.new(:coachEmail)
 
     def initialize(coachRepository, interactorOutput)
         @coachRepository = coachRepository
@@ -13,44 +13,44 @@ class AddClientToCoachUseCase
     end
 
     def addClientToCoach(reqModel)
-        @coachRepository.doesClientExist(reqModel.clientId) {
+        @coachRepository.doesClientExist(reqModel.clientEmail) {
             |doesClientExist, client| 
-            doesClientExist ? clientExistsCheckCoach(client, reqModel.coachId) : clientDoesntExistError(reqModel.clientId)
+            doesClientExist ? clientExistsCheckCoach(client, reqModel.coachEmail) : clientDoesntExistError(reqModel.clientEmail)
         } 
     end
 
-    def clientExistsCheckCoach(client, coachId)
-        @coachRepository.doesCoachExist(coachId) {
+    def clientExistsCheckCoach(client, coachEmail)
+        @coachRepository.doesCoachExist(coachEmail) {
             |doesCoachExist, coach| 
-            doesCoachExist ? clientAndCoachExist(client, coach) : coachDoesntExistError(coachId)
+            doesCoachExist ? clientAndCoachExist(client, coach) : coachDoesntExistError(coachEmail)
         }
     end
 
     def clientAndCoachExist(client, coach)
         @coachRepository.isClientAClientOfThisCoach(client, coach){
-            |isAlreadyAClient| !isAlreadyAClient ? validClientAndCoach(client, coach) : alreadyAClientError(client, coach)
+            |isAlreadyAClient| !isAlreadyAClient ? valemailClientAndCoach(client, coach) : alreadyAClientError(client, coach)
         }
     end
 
-    def validClientAndCoach(client, coach)
+    def valemailClientAndCoach(client, coach)
         @coachRepository.addClientToCoach(client, coach) {
-            resModel = ResModel.new(client.id, client.name, coach.id, coach.name)
+            resModel = ResModel.new(client.email, client.name, coach.email, coach.name)
             @interactorOutput.presentAddedClientToCoach(resModel)
         } 
     end
 
-    def clientDoesntExistError(clientId)
-        resModel = UnexistentClientResModel.new(clientId)
+    def clientDoesntExistError(clientEmail)
+        resModel = UnexistentClientResModel.new(clientEmail)
          @interactorOutput.presentUnexistentClientError(resModel)
     end
 
-    def coachDoesntExistError(coachId)
-        resModel = UnexistentCoachResModel.new(coachId)
+    def coachDoesntExistError(coachEmail)
+        resModel = UnexistentCoachResModel.new(coachEmail)
         @interactorOutput.presentUnexistentCoachError(resModel)
     end
 
     def alreadyAClientError(client, coach)
-        resModel = AlreadyAClientResModel.new(client.id, client.name, coach.id, coach.name)
+        resModel = AlreadyAClientResModel.new(client.email, client.name, coach.email, coach.name)
         @interactorOutput.presentAlreadyAClientError(resModel)
     end
     

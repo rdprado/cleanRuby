@@ -2,12 +2,12 @@ require './Entities/appointment'
 
 class ScheduleAppointmentUseCaseInteractor
 
-    ReqModel = Struct.new(:clientId, :coachId, :date, :title)
-    ResModel = Struct.new(:clientId, :clientName, :coachId, :coachName, :date, :title)
+    ReqModel = Struct.new(:clientEmail, :coachEmail, :date, :title)
+    ResModel = Struct.new(:clientEmail, :clientName, :coachEmail, :coachName, :date, :title)
 
-    NotAClientOfProfessorResModel = Struct.new(:clientId, :clientName, :coachId, :coachName)
-    UnexistentClientResModel = Struct.new(:clientId)
-    UnexistentCoachResModel = Struct.new(:coachId)
+    NotAClientOfProfessorResModel = Struct.new(:clientEmail, :clientName, :coachEmail, :coachName)
+    UnexistentClientResModel = Struct.new(:clientEmail)
+    UnexistentCoachResModel = Struct.new(:coachEmail)
 
     def initialize(repository, interactorOutput)
         @repository = repository
@@ -15,16 +15,16 @@ class ScheduleAppointmentUseCaseInteractor
     end
 
     def scheduleAppointment(reqModel)
-        @repository.doesClientExist(reqModel.clientId) {
+        @repository.doesClientExist(reqModel.clientEmail) {
             |doesClientExist, client| 
-            doesClientExist ? clientExistsCheckCoach(client, reqModel) : clientDoesntExistError(reqModel.clientId)
+            doesClientExist ? clientExistsCheckCoach(client, reqModel) : clientDoesntExistError(reqModel.clientEmail)
         } 
     end
 
     def clientExistsCheckCoach(client, reqModel)
-        @repository.doesCoachExist(reqModel.coachId) {
+        @repository.doesCoachExist(reqModel.coachEmail) {
             |doesCoachExist, coach| 
-            doesCoachExist ? clientAndCoachExist(client, coach, reqModel) : coachDoesntExistError(coachId)
+            doesCoachExist ? clientAndCoachExist(client, coach, reqModel) : coachDoesntExistError(reqModel.coachEmail)
         }
     end
 
@@ -37,23 +37,23 @@ class ScheduleAppointmentUseCaseInteractor
     def validClientAndCoach(client, coach, reqModel)
         appointment = Appointment.new(reqModel.date, reqModel.title)
         @repository.scheduleAppointment(appointment) {
-            resModel = ResModel.new(client.id, client.name, coach.id, coach.name, appointment.date, appointment.title);
+            resModel = ResModel.new(client.email, client.name, coach.email, coach.name, appointment.date, appointment.title);
             @interactorOutput.presentAppointment(resModel)
         } 
     end
 
-    def clientDoesntExistError(clientId)
-        resModel = UnexistentClientResModel.new(clientId)
+    def clientDoesntExistError(clientEmail)
+        resModel = UnexistentClientResModel.new(clientEmail)
          @interactorOutput.presentUnexistentClientError(resModel)
     end
 
-    def coachDoesntExistError(coachId)
-        resModel = UnexistentCoachResModel.new(coachId)
+    def coachDoesntExistError(coachEmail)
+        resModel = UnexistentCoachResModel.new(coachEmail)
         @interactorOutput.presentUnexistentCoachError(resModel)
     end
 
     def notAClient(client, coach)
-        resModel = NotAClientOfProfessorResModel.new(client.id, client.name, coach.id, coach.name)
+        resModel = NotAClientOfProfessorResModel.new(client.email, client.name, coach.email, coach.name)
         @interactorOutput.presentNotAClientOfProfessorError(resModel)
     end
 

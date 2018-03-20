@@ -15,17 +15,17 @@ class RepoSpy
         yield("", "", "", "", "", "")
     end
 
-    def doesCoachExist(coachId)
-        yield(true, Coach.new(coachId, "Marcos"))
+    def doesCoachExist(coachEmail)
+        yield(true, Coach.new(coachEmail, "Marcos"))
     end
 
-    def doesClientExist(clientId)
-        yield(true, Client.new(clientId, "Joao"))
+    def doesClientExist(email)
+        yield(true, Client.new(email, "Joao"))
     end
 end
 
 class RepoUnexistentClientStub < RepoSpy
-    def doesClientExist(clientId)
+    def doesClientExist(email)
         yield(false, nil)
     end 
 end
@@ -35,7 +35,7 @@ class RepoUnexistentCoachStub < RepoSpy
         yield(true)
     end
 
-    def doesCoachExist(coachId)
+    def doesCoachExist(coachEmail)
         yield(false, nil)
     end
 end
