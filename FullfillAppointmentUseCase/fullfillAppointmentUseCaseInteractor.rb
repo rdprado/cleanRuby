@@ -1,14 +1,6 @@
 require './Entities/appointment'
-
-class FullfillAppointmentUseCaseModels
-    ReqModel = Struct.new(:clientId, :coachId, :date)
-    ResModel = Struct.new(:clientId, :coachId, :date) 
-end
-
-#class FullfillAppointmentDataErrors
-class CannnotFetchAppointment < StandardError
-end
-#end
+require './FullfillAppointmentUseCase/fullfillAppointmentDataErrors'
+require './FullfillAppointmentUseCase/fullfillAppointmentUseCaseModels'
 
 class FullfillAppointmentUseCaseInteractor
     def initialize(repository, interactorOutput)

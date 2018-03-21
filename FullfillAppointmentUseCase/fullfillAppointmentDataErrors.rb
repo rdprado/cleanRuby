@@ -1,0 +1,2 @@
+class CannnotFetchAppointment < StandardError
+end

@@ -1,5 +1,7 @@
 require 'test/unit'
 require './FullfillAppointmentUseCase/fullfillAppointmentUseCaseInteractor'
+require './FullfillAppointmentUseCase/fullfillAppointmentDataErrors'
+require './FullfillAppointmentUseCase/fullfillAppointmentUseCaseModels'
 require './Entities/appointment'
 
 class RepoSpy
