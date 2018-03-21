@@ -28,11 +28,11 @@ class AddClientToCoachUseCase
 
     def clientAndCoachExist(client, coach)
         @coachRepository.isClientAClientOfThisCoach(client, coach){
-            |isAlreadyAClient| !isAlreadyAClient ? valemailClientAndCoach(client, coach) : alreadyAClientError(client, coach)
+            |isAlreadyAClient| !isAlreadyAClient ? validClientAndCoach(client, coach) : alreadyAClientError(client, coach)
         }
     end
 
-    def valemailClientAndCoach(client, coach)
+    def validClientAndCoach(client, coach)
         @coachRepository.addClientToCoach(client, coach) {
             resModel = ResModel.new(client.email, client.name, coach.email, coach.name)
             @interactorOutput.presentAddedClientToCoach(resModel)

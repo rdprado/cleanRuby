@@ -6,4 +6,8 @@ class Appointment
         @date = date
         @title = title
     end
+
+    def fullfill()
+        @fullfilled = true
+    end
 end
