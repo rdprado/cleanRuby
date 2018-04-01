@@ -1,5 +1,5 @@
 require 'test/unit'
-require './ScheduleAppointmentUseCase/scheduleAppointmentUseCaseInteractor'
+require './UseCases/ScheduleAppointmentUseCase/scheduleAppointmentUseCaseInteractor'
 require './Entities/client'
 require './Entities/coach'
 

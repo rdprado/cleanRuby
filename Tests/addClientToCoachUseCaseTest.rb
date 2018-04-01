@@ -1,5 +1,5 @@
 require 'test/unit'
-require './AddClientToCoachUseCase/addClientToCoachUseCase'
+require './UseCases/AddClientToCoachUseCase/addClientToCoachUseCase'
 require './Entities/client'
 require './Entities/coach'
 #require Entities
