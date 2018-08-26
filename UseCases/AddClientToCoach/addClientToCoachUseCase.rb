@@ -14,15 +14,19 @@ class AddClientToCoachUseCase
 
     def addClientToCoach(reqModel)
         @coachRepository.fetchClient(reqModel.clientEmail) {
-            |client, error| 
-            error == :noErrors ? validClient(client, reqModel.coachEmail) : clientDoesntExistError(reqModel.clientEmail)
+            |client, error|
+            if error == :noError
+                validClient(client, reqModel.coachEmail)
+            else
+                clientDoesntExistError(reqModel.clientEmail)
+            end
         } 
     end
 
     def validClient(client, coachEmail)
         @coachRepository.fetchCoach(coachEmail) {
             |coach, error| 
-            if error == :noErrors
+            if error == :noError
                 validCoach(client, coach)
             else
                 coachDoesntExistError(coachEmail)
@@ -33,7 +37,7 @@ class AddClientToCoachUseCase
     def validCoach(client, coach)
         @coachRepository.addClientToCoach(client, coach) {
             |error|
-            if error == :noErrors
+            if error == :noError
                 resModel = ResModel.new(client.email, client.name, coach.email, coach.name)
                 @interactorOutput.presentAddedClientToCoach(resModel)
             else

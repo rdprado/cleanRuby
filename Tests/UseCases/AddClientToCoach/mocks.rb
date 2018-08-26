@@ -3,16 +3,16 @@ class RepoSpy
     attr_reader :addClientToCoachCalled
 
     def fetchClient(email)
-        yield(Client.new(email, "Joao"), :noErrors)
+        yield(Client.new(email, "Joao"), :noError)
     end
 
     def fetchCoach(email)
-        yield(Coach.new(email, "Marcos"), :noErrors)
+        yield(Coach.new(email, "Marcos"), :noError)
     end
     
     def addClientToCoach(client, coach)
         @addClientToCoachCalled = true
-        yield(:noErrors)
+        yield(:noError)
     end
 end
 

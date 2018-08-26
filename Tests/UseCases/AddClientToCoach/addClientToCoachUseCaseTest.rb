@@ -4,7 +4,6 @@ require './Entities/client'
 require './Entities/coach'
 
 require_relative 'mocks'
-#require Entities
 
 class AddClientToCoachUseCaseTest < Test::Unit::TestCase
 
