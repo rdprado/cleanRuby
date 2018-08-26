@@ -13,29 +13,32 @@ class AddClientToCoachUseCase
     end
 
     def addClientToCoach(reqModel)
-        @coachRepository.doesClientExist(reqModel.clientEmail) {
-            |doesClientExist, client| 
-            doesClientExist ? clientExistsCheckCoach(client, reqModel.coachEmail) : clientDoesntExistError(reqModel.clientEmail)
+        @coachRepository.fetchClient(reqModel.clientEmail) {
+            |client, error| 
+            error == :noErrors ? validClient(client, reqModel.coachEmail) : clientDoesntExistError(reqModel.clientEmail)
         } 
     end
 
-    def clientExistsCheckCoach(client, coachEmail)
-        @coachRepository.doesCoachExist(coachEmail) {
-            |doesCoachExist, coach| 
-            doesCoachExist ? clientAndCoachExist(client, coach) : coachDoesntExistError(coachEmail)
+    def validClient(client, coachEmail)
+        @coachRepository.fetchCoach(coachEmail) {
+            |coach, error| 
+            if error == :noErrors
+                validCoach(client, coach)
+            else
+                coachDoesntExistError(coachEmail)
+            end
         }
     end
 
-    def clientAndCoachExist(client, coach)
-        @coachRepository.isClientAClientOfThisCoach(client, coach){
-            |isAlreadyAClient| !isAlreadyAClient ? validClientAndCoach(client, coach) : alreadyAClientError(client, coach)
-        }
-    end
-
-    def validClientAndCoach(client, coach)
+    def validCoach(client, coach)
         @coachRepository.addClientToCoach(client, coach) {
-            resModel = ResModel.new(client.email, client.name, coach.email, coach.name)
-            @interactorOutput.presentAddedClientToCoach(resModel)
+            |error|
+            if error == :noErrors
+                resModel = ResModel.new(client.email, client.name, coach.email, coach.name)
+                @interactorOutput.presentAddedClientToCoach(resModel)
+            else
+                alreadyAClientError(client, coach)
+            end
         } 
     end
 

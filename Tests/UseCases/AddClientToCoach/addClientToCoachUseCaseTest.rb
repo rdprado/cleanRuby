@@ -1,75 +1,13 @@
 require 'test/unit'
-require './UseCases/AddClientToCoachUseCase/addClientToCoachUseCase'
+require './UseCases/AddClientToCoach/addClientToCoachUseCase'
 require './Entities/client'
 require './Entities/coach'
+
+require_relative 'mocks'
 #require Entities
 
-class RepoSpy
-
-    attr_reader :addClientToCoachCalled
-
-    def isClientAClientOfThisCoach(client, coach)
-        yield(false)
-    end
-
-    def doesCoachExist(coachEmail)
-        yield(true, Coach.new(coachEmail, "Marcos"))
-    end
-
-    def doesClientExist(clientEmail)
-        yield(true, Client.new(clientEmail, "Joao"))
-    end
-
-    def addClientToCoach(client, coach)
-        @addClientToCoachCalled = true
-        yield
-    end
-end
-
-
-class RepoInvalidClientStub < RepoSpy
-    def doesClientExist(clientEmail)
-        yield(false, nil)
-    end
-end
-
-class RepoInvalidCoachStub < RepoSpy
-    def doesCoachExist(coachEmail)
-        yield(false, nil)
-    end
-end
-
-class RepoAlreadyAClientStub < RepoSpy
-    def isClientAClientOfThisCoach(client, coach)
-        yield(true)
-    end
-end
-
-class AddClientToCoachPresenterSpy
-
-    attr_reader :presentAddedClientToCoachCalled,
-     :presentAlreadyAClientErrorCalled,
-     :presentUnexistentClientErrorCalled,
-     :presentUnexistentCoachErrorCalled
-
-    def presentAddedClientToCoach(resModel)
-        @presentAddedClientToCoachCalled = true
-    end
-
-    def presentAlreadyAClientError(resModel)
-        @presentAlreadyAClientErrorCalled = true
-    end
-
-    def presentUnexistentClientError(resModel)
-        @presentUnexistentClientErrorCalled = true
-    end
-
-    def presentUnexistentCoachError(resModel)
-        @presentUnexistentCoachErrorCalled = true
-    end
-end
-
 class AddClientToCoachUseCaseTest < Test::Unit::TestCase
+
     def testAddClientToCoachUseCaseTestShouldCallCoachRepoAndOutput
         repo = RepoSpy.new
         presenter = AddClientToCoachPresenterSpy.new
@@ -99,7 +37,7 @@ class AddClientToCoachUseCaseTest < Test::Unit::TestCase
         reqModel = AddClientToCoachUseCase::ReqModel.new("junim@gmail.com", "lalalau@gmail.com")
         addClientToCoachUseCase.addClientToCoach(reqModel)
 
-        assert(!repo.addClientToCoachCalled)
+        assert(repo.addClientToCoachCalled)
         assert(!presenter.presentAddedClientToCoachCalled)
         assert(presenter.presentAlreadyAClientErrorCalled)
     end
